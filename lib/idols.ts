@@ -36,4 +36,10 @@ export const idols: Idol[] = [
     group: "NCT WISH",
     image: "/sion.jpg",
   },
+  {
+    id: "kirua",
+    name: "키르아",
+    group: "헌터 헌터",
+    image: "/idols/chria.jpg",
+  },
 ]
