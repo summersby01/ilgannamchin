@@ -42,4 +42,22 @@ export const idols: Idol[] = [
     group: "헌터 헌터",
     image: "/idols/chria.jpg",
   },
+  {
+    id: "kirua3",
+    name: "키르아",
+    group: "헌터 헌터",
+    image: "/idols/zordic.jpg",
+  },
+  {
+    id: "kirua2",
+    name: "키르아",
+    group: "헌터 헌터",
+    image: "/idols/kjd.jpg",
+  },
+  {
+    id: "booseungkwan",
+    name: "부승관",
+    group: "세븐틴",
+    image: "/idols/boo.jpg",
+  },
 ]
