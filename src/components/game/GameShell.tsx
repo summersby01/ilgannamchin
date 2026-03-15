@@ -19,7 +19,6 @@ export function GameShell() {
   const [selectedIdolId, setSelectedIdolId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
 
   const intervalRef = useRef<number | null>(null);
   const resultCardRef = useRef<HTMLDivElement>(null);
@@ -94,25 +93,23 @@ export function GameShell() {
       return null;
     }
 
-    const baseUrl =
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      (typeof window !== "undefined" ? window.location.origin : "");
+    const currentOrigin =
+      typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || "";
+    const currentUrl =
+      typeof window !== "undefined" ? window.location.href : process.env.NEXT_PUBLIC_SITE_URL || "";
 
     return {
-      title: "일간남친",
-      text: `내 오늘의 남자친구 결과 나옴\n${selectedIdol.name}이 나왔어\n너도 해봐`,
-      url: baseUrl,
-      imageUrl: `${baseUrl}${selectedIdol.image}`,
+      title: "일간남친 💘",
+      text: "오늘의 남자친구 테스트 결과",
+      url: currentUrl,
+      imageUrl: `${currentOrigin}${selectedIdol.image}`,
     };
   }
 
-  async function handleTwitterShare() {
+  function handleTwitterShare() {
     if (!selectedIdol) {
       return;
     }
-
-    setIsSharing(true);
-    setFeedback(null);
 
     try {
       const sharePayload = getSharePayload();
@@ -121,12 +118,10 @@ export function GameShell() {
         return;
       }
 
-      openTwitterShare(sharePayload);
-      setFeedback("트위터 공유 창을 열었어요.");
+      const result = openTwitterShare(sharePayload);
+      setFeedback(result === "redirected" ? "트위터 공유 화면으로 이동해요." : "트위터 공유 창을 열었어요.");
     } catch {
       setFeedback("공유에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSharing(false);
     }
   }
 
@@ -135,7 +130,6 @@ export function GameShell() {
       return;
     }
 
-    setIsSharing(true);
     setFeedback(null);
 
     try {
@@ -148,20 +142,20 @@ export function GameShell() {
       const result = await shareViaKakao(sharePayload);
 
       if (result === "missing_key") {
-        setFeedback("카카오 공유를 사용하려면 Kakao JavaScript SDK 키를 설정해야 합니다.");
+        setFeedback("카카오 공유를 사용하려면 NEXT_PUBLIC_KAKAO_JS_KEY를 설정해야 합니다.");
         return;
       }
 
       if (result === "sdk_unavailable") {
-        setFeedback("카카오 SDK를 불러오지 못했습니다. 잠시 후 다시 시도해주세요.");
+        setFeedback("카카오 SDK가 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.");
         return;
       }
 
       setFeedback("카카오톡 공유 창을 열었어요.");
     } catch {
-      setFeedback("카카오톡 공유에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSharing(false);
+      setFeedback(
+        "카카오톡 공유에 실패했습니다. 현재 접속 주소가 카카오 개발자 콘솔의 웹 도메인에 등록되어 있는지와 JavaScript 키 사용 여부를 확인해주세요.",
+      );
     }
   }
 
@@ -170,7 +164,6 @@ export function GameShell() {
       return;
     }
 
-    setIsSharing(true);
     setFeedback(null);
 
     try {
@@ -184,8 +177,6 @@ export function GameShell() {
       setFeedback(result === "shared" ? "공유 창을 열었어요." : "공유가 지원되지 않아 링크를 복사했어요.");
     } catch {
       setFeedback("공유에 실패했습니다. 다시 시도해주세요.");
-    } finally {
-      setIsSharing(false);
     }
   }
 
@@ -226,12 +217,6 @@ export function GameShell() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="w-full max-w-[430px]">
-        <div className="mb-4 flex items-center justify-center">
-          <div className="rounded-full bg-white/55 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-berry shadow-sm ring-1 ring-white/60">
-            Mobile First MVP
-          </div>
-        </div>
-
         {phase === "home" ? <HomeScreen disabled={idols.length === 0} onStart={handleStart} /> : null}
         {phase === "rolling" && currentIdol ? (
           <RollingScreen currentIdol={currentIdol} onStop={handleStop} />
@@ -242,7 +227,7 @@ export function GameShell() {
             feedback={feedback}
             idol={selectedIdol}
             isSaving={isSaving}
-            isShareBusy={isSharing}
+            isShareBusy={false}
             onRestart={handleRestart}
             onSave={handleSave}
             onTwitterShare={handleTwitterShare}

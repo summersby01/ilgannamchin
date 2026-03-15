@@ -19,10 +19,8 @@ type BaseSharePayload = {
 
 type KakaoShareResult = "shared" | "missing_key" | "sdk_unavailable";
 
-const KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.4/kakao.min.js";
-
 function getKakaoKey() {
-  return process.env.NEXT_PUBLIC_KAKAO_JAVASCRIPT_KEY;
+  return process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
 }
 
 function buildTwitterShareUrl(payload: BaseSharePayload) {
@@ -34,9 +32,24 @@ function buildTwitterShareUrl(payload: BaseSharePayload) {
   return `https://twitter.com/intent/tweet?${params.toString()}`;
 }
 
-export function openTwitterShare(payload: BaseSharePayload) {
+function isMobileBrowser() {
+  if (typeof navigator === "undefined") {
+    return false;
+  }
+
+  return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+}
+
+export function openTwitterShare(payload: BaseSharePayload): "opened" | "redirected" {
   const shareUrl = buildTwitterShareUrl(payload);
+
+  if (isMobileBrowser()) {
+    window.location.href = shareUrl;
+    return "redirected";
+  }
+
   window.open(shareUrl, "_blank", "noopener,noreferrer,width=540,height=720");
+  return "opened";
 }
 
 export async function shareWithSystem(payload: BaseSharePayload): Promise<"shared" | "copied"> {
@@ -66,32 +79,6 @@ export async function copyShareLink(payload: BaseSharePayload): Promise<void> {
   document.body.removeChild(textArea);
 }
 
-async function loadKakaoSdk(): Promise<typeof window.Kakao | undefined> {
-  if (window.Kakao) {
-    return window.Kakao;
-  }
-
-  const existingScript = document.querySelector<HTMLScriptElement>(
-    `script[src="${KAKAO_SDK_URL}"]`,
-  );
-
-  if (existingScript) {
-    return new Promise((resolve) => {
-      existingScript.addEventListener("load", () => resolve(window.Kakao), { once: true });
-      existingScript.addEventListener("error", () => resolve(undefined), { once: true });
-    });
-  }
-
-  return new Promise((resolve) => {
-    const script = document.createElement("script");
-    script.src = KAKAO_SDK_URL;
-    script.async = true;
-    script.onload = () => resolve(window.Kakao);
-    script.onerror = () => resolve(undefined);
-    document.head.appendChild(script);
-  });
-}
-
 export async function shareViaKakao(payload: BaseSharePayload): Promise<KakaoShareResult> {
   const kakaoKey = getKakaoKey();
 
@@ -99,7 +86,7 @@ export async function shareViaKakao(payload: BaseSharePayload): Promise<KakaoSha
     return "missing_key";
   }
 
-  const kakao = await loadKakaoSdk();
+  const kakao = window.Kakao;
 
   if (!kakao) {
     return "sdk_unavailable";

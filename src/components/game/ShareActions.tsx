@@ -64,7 +64,7 @@ export function ShareActions({
   ];
 
   return (
-    <div className="rounded-[28px] bg-gradient-to-b from-white/90 to-rose/35 px-4 py-5">
+    <div className="relative z-10 rounded-[28px] bg-gradient-to-b from-white/90 to-rose/35 px-4 py-5">
       <div className="flex items-start justify-center gap-4 sm:gap-5">
         {items.map((item) => (
           <div key={item.key} className="flex min-w-[78px] flex-col items-center">
@@ -74,9 +74,10 @@ export function ShareActions({
               disabled={isBusy}
               onClick={item.onClick}
               className={[
-                "flex h-16 w-16 items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blush disabled:cursor-not-allowed disabled:opacity-55",
+                "relative z-10 flex h-16 w-16 touch-manipulation items-center justify-center rounded-full transition duration-200 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blush disabled:cursor-not-allowed disabled:opacity-55",
                 actionStyles[item.key],
               ].join(" ")}
+              style={{ WebkitTapHighlightColor: "transparent" }}
             >
               {iconMap[item.key]}
             </button>
