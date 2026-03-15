@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 type ShareActionItem = {
   key: "twitter" | "kakao" | "copy";
   label: string;
@@ -28,11 +30,11 @@ function KakaoIcon() {
   );
 }
 
-function LinkIcon() {
+function ShareIcon() {
   return (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 fill-none stroke-current stroke-[2]">
-      <path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 1 0-7.07-7.07L11.2 4.7" />
-      <path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L12.8 19.3" />
+      <path d="M14 5l7 7-7 7" />
+      <path d="M21 12H9a6 6 0 0 0-6 6" />
     </svg>
   );
 }
@@ -46,7 +48,7 @@ const actionStyles: Record<ShareActionItem["key"], string> = {
 const iconMap: Record<ShareActionItem["key"], ReactNode> = {
   twitter: <TwitterIcon />,
   kakao: <KakaoIcon />,
-  copy: <LinkIcon />,
+  copy: <ShareIcon />,
 };
 
 export function ShareActions({
@@ -56,24 +58,9 @@ export function ShareActions({
   onCopyLink,
 }: ShareActionsProps) {
   const items: ShareActionItem[] = [
-    {
-      key: "twitter",
-      label: "트위터",
-      ariaLabel: "트위터로 공유",
-      onClick: onTwitterShare,
-    },
-    {
-      key: "kakao",
-      label: "카카오톡",
-      ariaLabel: "카카오톡으로 공유",
-      onClick: onKakaoShare,
-    },
-    {
-      key: "copy",
-      label: "링크복사",
-      ariaLabel: "링크 복사",
-      onClick: onCopyLink,
-    },
+    { key: "twitter", label: "트위터", ariaLabel: "트위터로 공유", onClick: onTwitterShare },
+    { key: "kakao", label: "카카오톡", ariaLabel: "카카오톡으로 공유", onClick: onKakaoShare },
+    { key: "copy", label: "공유하기", ariaLabel: "공유하기", onClick: onCopyLink },
   ];
 
   return (
@@ -102,4 +89,3 @@ export function ShareActions({
     </div>
   );
 }
-import type { ReactNode } from "react";

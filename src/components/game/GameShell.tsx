@@ -8,7 +8,7 @@ import { ResultScreen } from "@/components/game/ResultScreen";
 import { RollingScreen } from "@/components/game/RollingScreen";
 import { idols } from "@/lib/idols";
 import { saveElementAsPng } from "@/lib/save-image";
-import { copyShareLink, openTwitterShare, shareViaKakao } from "@/lib/share";
+import { openTwitterShare, shareViaKakao, shareWithSystem } from "@/lib/share";
 import type { GamePhase } from "@/types/idol";
 
 const ROLL_INTERVAL_MS = 110;
@@ -102,6 +102,7 @@ export function GameShell() {
       title: "일간남친",
       text: `내 오늘의 남자친구 결과 나옴\n${selectedIdol.name}이 나왔어\n너도 해봐`,
       url: baseUrl,
+      imageUrl: `${baseUrl}${selectedIdol.image}`,
     };
   }
 
@@ -179,10 +180,10 @@ export function GameShell() {
         return;
       }
 
-      await copyShareLink(sharePayload);
-      setFeedback("링크를 복사했어요.");
+      const result = await shareWithSystem(sharePayload);
+      setFeedback(result === "shared" ? "공유 창을 열었어요." : "공유가 지원되지 않아 링크를 복사했어요.");
     } catch {
-      setFeedback("링크 복사에 실패했습니다. 다시 시도해주세요.");
+      setFeedback("공유에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setIsSharing(false);
     }

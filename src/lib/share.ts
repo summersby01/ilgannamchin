@@ -14,6 +14,7 @@ type BaseSharePayload = {
   title: string;
   text: string;
   url: string;
+  imageUrl?: string;
 };
 
 type KakaoShareResult = "shared" | "missing_key" | "sdk_unavailable";
@@ -36,6 +37,16 @@ function buildTwitterShareUrl(payload: BaseSharePayload) {
 export function openTwitterShare(payload: BaseSharePayload) {
   const shareUrl = buildTwitterShareUrl(payload);
   window.open(shareUrl, "_blank", "noopener,noreferrer,width=540,height=720");
+}
+
+export async function shareWithSystem(payload: BaseSharePayload): Promise<"shared" | "copied"> {
+  if (navigator.share) {
+    await navigator.share(payload);
+    return "shared";
+  }
+
+  await copyShareLink(payload);
+  return "copied";
 }
 
 export async function copyShareLink(payload: BaseSharePayload): Promise<void> {
@@ -103,7 +114,7 @@ export async function shareViaKakao(payload: BaseSharePayload): Promise<KakaoSha
     content: {
       title: payload.title,
       description: payload.text,
-      imageUrl: `${payload.url}/idols/cha-eunwoo.svg`,
+      imageUrl: payload.imageUrl ?? `${payload.url}/youngk.jpg`,
       link: {
         mobileWebUrl: payload.url,
         webUrl: payload.url,
