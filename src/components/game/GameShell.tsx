@@ -6,20 +6,17 @@ import { Button } from "@/components/ui/Button";
 import { HomeScreen } from "@/components/game/HomeScreen";
 import { ResultScreen } from "@/components/game/ResultScreen";
 import { RollingScreen } from "@/components/game/RollingScreen";
-import { fetchMockIdols } from "@/lib/mock-idols";
+import { idols } from "@/lib/idols";
 import { saveElementAsPng } from "@/lib/save-image";
 import { copyShareLink, openTwitterShare, shareViaKakao } from "@/lib/share";
-import type { GamePhase, Idol } from "@/types/idol";
+import type { GamePhase } from "@/types/idol";
 
 const ROLL_INTERVAL_MS = 110;
 
 export function GameShell() {
   const [phase, setPhase] = useState<GamePhase>("home");
-  const [idols, setIdols] = useState<Idol[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [selectedIdol, setSelectedIdol] = useState<Idol | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [selectedIdolId, setSelectedIdolId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
@@ -28,50 +25,15 @@ export function GameShell() {
   const resultCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let mounted = true;
-
-    async function loadIdols() {
-      try {
-        const items = await fetchMockIdols();
-
-        if (!mounted) {
-          return;
-        }
-
-        if (items.length === 0) {
-          setError("표시할 아이돌 데이터가 없습니다.");
-          return;
-        }
-
-        setIdols(items);
-      } catch {
-        if (mounted) {
-          setError("아이돌 목록을 불러오지 못했습니다.");
-        }
-      } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    loadIdols();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
     if (idols.length === 0) {
       return;
     }
 
     idols.forEach((idol) => {
       const image = new window.Image();
-      image.src = idol.imageUrl;
+      image.src = idol.image;
     });
-  }, [idols]);
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -93,7 +55,7 @@ export function GameShell() {
 
     stopRollingTimer();
     setFeedback(null);
-    setSelectedIdol(null);
+    setSelectedIdolId(null);
     setPhase("rolling");
 
     intervalRef.current = window.setInterval(() => {
@@ -104,7 +66,7 @@ export function GameShell() {
   function handleStop() {
     stopRollingTimer();
     const chosen = idols[currentIndex];
-    setSelectedIdol(chosen);
+    setSelectedIdolId(chosen.id);
     setPhase("result");
     setFeedback(null);
   }
@@ -127,14 +89,18 @@ export function GameShell() {
     }
   }
 
-  function getSharePayload(idol: Idol) {
+  function getSharePayload() {
+    if (!selectedIdol) {
+      return null;
+    }
+
     const baseUrl =
       process.env.NEXT_PUBLIC_SITE_URL ||
       (typeof window !== "undefined" ? window.location.origin : "");
 
     return {
       title: "일간남친",
-      text: `내 오늘의 남자친구 결과 나옴\n${idol.name}이 나왔어\n너도 해봐`,
+      text: `내 오늘의 남자친구 결과 나옴\n${selectedIdol.name}이 나왔어\n너도 해봐`,
       url: baseUrl,
     };
   }
@@ -148,7 +114,13 @@ export function GameShell() {
     setFeedback(null);
 
     try {
-      openTwitterShare(getSharePayload(selectedIdol));
+      const sharePayload = getSharePayload();
+
+      if (!sharePayload) {
+        return;
+      }
+
+      openTwitterShare(sharePayload);
       setFeedback("트위터 공유 창을 열었어요.");
     } catch {
       setFeedback("공유에 실패했습니다. 다시 시도해주세요.");
@@ -166,7 +138,13 @@ export function GameShell() {
     setFeedback(null);
 
     try {
-      const result = await shareViaKakao(getSharePayload(selectedIdol));
+      const sharePayload = getSharePayload();
+
+      if (!sharePayload) {
+        return;
+      }
+
+      const result = await shareViaKakao(sharePayload);
 
       if (result === "missing_key") {
         setFeedback("카카오 공유를 사용하려면 Kakao JavaScript SDK 키를 설정해야 합니다.");
@@ -195,7 +173,13 @@ export function GameShell() {
     setFeedback(null);
 
     try {
-      await copyShareLink(getSharePayload(selectedIdol));
+      const sharePayload = getSharePayload();
+
+      if (!sharePayload) {
+        return;
+      }
+
+      await copyShareLink(sharePayload);
       setFeedback("링크를 복사했어요.");
     } catch {
       setFeedback("링크 복사에 실패했습니다. 다시 시도해주세요.");
@@ -207,27 +191,17 @@ export function GameShell() {
   function handleRestart() {
     stopRollingTimer();
     setPhase("home");
-    setSelectedIdol(null);
+    setSelectedIdolId(null);
     setCurrentIndex(0);
     setFeedback(null);
   }
 
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center px-4 py-10">
-        <div className="w-full max-w-[430px] rounded-[32px] bg-white/78 px-6 py-10 text-center shadow-card backdrop-blur-sm">
-          <p className="text-base font-semibold text-berry">아이돌 목록을 불러오는 중...</p>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
+  if (idols.length === 0) {
     return (
       <main className="flex min-h-screen items-center justify-center px-4 py-10">
         <div className="w-full max-w-[430px]">
           <ErrorNotice
-            message={error}
+            message="표시할 아이돌 데이터가 없습니다."
             action={
               <Button
                 aria-label="다시 시도"
@@ -243,7 +217,10 @@ export function GameShell() {
     );
   }
 
-  const currentIdol = idols[currentIndex];
+  const currentIdol = idols[currentIndex % idols.length];
+  const selectedIdol = selectedIdolId
+    ? idols.find((idol) => idol.id === selectedIdolId) ?? null
+    : null;
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-8">

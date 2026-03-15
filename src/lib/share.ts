@@ -103,7 +103,7 @@ export async function shareViaKakao(payload: BaseSharePayload): Promise<KakaoSha
     content: {
       title: payload.title,
       description: payload.text,
-      imageUrl: `${payload.url}/mock-idols/chaeunwoo.svg`,
+      imageUrl: `${payload.url}/idols/cha-eunwoo.svg`,
       link: {
         mobileWebUrl: payload.url,
         webUrl: payload.url,

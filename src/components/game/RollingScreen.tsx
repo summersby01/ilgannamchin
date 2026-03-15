@@ -14,12 +14,13 @@ export function RollingScreen({ currentIdol, onStop }: RollingScreenProps) {
         <div className="relative aspect-[3/4] overflow-hidden rounded-[24px] bg-white">
           <Image
             priority
-            src={currentIdol.imageUrl}
+            src={currentIdol.image}
             alt={`${currentIdol.name} 이미지`}
             fill
-            className="object-cover"
+            className="object-cover object-center"
             sizes="(max-width: 768px) 90vw, 420px"
           />
+          <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
         </div>
       </div>
       <div className="mt-6 w-full">

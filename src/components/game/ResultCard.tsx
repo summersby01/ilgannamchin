@@ -11,17 +11,18 @@ export function ResultCard({ idol }: ResultCardProps) {
       <div className="rounded-[24px] bg-gradient-to-b from-[#fff4f7] to-[#ffe0ea] p-3">
         <div className="relative aspect-[3/4] overflow-hidden rounded-[20px] bg-white">
           <Image
-            src={idol.imageUrl}
+            src={idol.image}
             alt={`${idol.name} 결과 이미지`}
             fill
-            className="object-cover"
+            className="object-cover object-center"
             sizes="(max-width: 768px) 88vw, 400px"
           />
+          <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#261520]/70 to-transparent px-4 pb-4 pt-16 text-left text-white">
             <div className="text-xs font-medium tracking-[0.24em] text-white/80">TODAY&apos;S PICK</div>
             <div className="mt-2 text-3xl font-black tracking-[-0.03em]">{idol.name}</div>
-            {idol.groupName ? (
-              <div className="mt-1 text-sm font-medium text-white/88">{idol.groupName}</div>
+            {idol.group ? (
+              <div className="mt-1 text-sm font-medium text-white/88">{idol.group}</div>
             ) : null}
           </div>
         </div>

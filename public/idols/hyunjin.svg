@@ -1,0 +1,16 @@
+<svg width="720" height="960" viewBox="0 0 720 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="720" height="960" rx="48" fill="#DFFFEF"/>
+  <rect x="40" y="40" width="640" height="880" rx="36" fill="url(#paint0_linear)"/>
+  <circle cx="360" cy="288" r="156" fill="#F4FFF8"/>
+  <path d="M262 286C262 227.458 309.458 180 368 180C426.542 180 474 227.458 474 286V340H262V286Z" fill="#23382C"/>
+  <rect x="246" y="398" width="228" height="270" rx="114" fill="#F4FFF8"/>
+  <path d="M218 782C218 708.994 277.194 650 350.2 650H369.8C442.806 650 502 708.994 502 782V822H218V782Z" fill="#8DE6B5"/>
+  <rect x="162" y="762" width="396" height="96" rx="32" fill="#F4FFF8" fill-opacity="0.76"/>
+  <text x="360" y="821" text-anchor="middle" fill="#237A49" font-family="Arial, sans-serif" font-size="46" font-weight="700">HYUNJIN</text>
+  <defs>
+    <linearGradient id="paint0_linear" x1="92" y1="84" x2="620" y2="884" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6ED19A"/>
+      <stop offset="1" stop-color="#C9FFE1"/>
+    </linearGradient>
+  </defs>
+</svg>

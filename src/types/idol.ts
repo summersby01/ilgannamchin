@@ -1,8 +1,8 @@
 export type Idol = {
   id: string;
   name: string;
-  groupName: string | null;
-  imageUrl: string;
+  group: string | null;
+  image: string;
 };
 
 export type GamePhase = "home" | "rolling" | "result";
